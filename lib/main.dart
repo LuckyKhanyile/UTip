@@ -1,8 +1,8 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-//import 'package:flutter/widgets.dart';
+import 'package:utip/bill_amount_field.dart';
+import 'package:utip/person_counter.dart';
+import 'package:utip/tip_slider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,6 +35,12 @@ class UTip extends StatefulWidget {
 
 class _UTipState extends State<UTip> {
   int _personCount = 1;
+  double _tipPercentage = 0;
+  double _billTotal = 100.0;
+
+  double totalPerPerson(){
+    return (_billTotal*_tipPercentage+_billTotal)/_personCount;
+  }
 
   //Methods
   void increment(){
@@ -45,7 +51,7 @@ class _UTipState extends State<UTip> {
 
   void decrement(){
     setState(() {
-      if(_personCount>0){
+      if(_personCount>1){
         _personCount--;
       }
        
@@ -56,7 +62,7 @@ class _UTipState extends State<UTip> {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    
+    double total = totalPerPerson();
     final style = theme.textTheme.titleMedium!.copyWith(
       color: theme.colorScheme.onPrimary,
       fontWeight: FontWeight.bold,
@@ -83,7 +89,7 @@ class _UTipState extends State<UTip> {
               children: [
                 
                 Text("total per Peson",style: style,),
-                Text("\$23.89", style: style.copyWith(
+                Text("\$$total", style: style.copyWith(
                   color: theme.colorScheme.onPrimary,
                   fontSize: theme.textTheme.displaySmall?.fontSize
                 ),),
@@ -93,8 +99,8 @@ class _UTipState extends State<UTip> {
         Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
-       
-                   decoration: BoxDecoration(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
                       border:Border.all(
                         color: theme.colorScheme.primary,
@@ -104,36 +110,31 @@ class _UTipState extends State<UTip> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      
-                     TextField(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.attach_money),
-                        labelText: 'Bill Amount',
-                      ),
-                      keyboardType: TextInputType.number,
-                      onChanged: (String value) {},
+                    //== Bill Amount Text Field
+                     BillAmountTextField(billamount: _billTotal.toString(), 
+                     onChanged: (String value) { 
+                      setState(() {
+                        _billTotal=double.parse(value);
+                      });
+                      },
                      ),
                     
+                    PersonCounter(theme: theme, personCount: _personCount, 
+                    onDecreament: decrement, onIncreament: increment)
+                    ,
+                     // == section  Tip ==
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Split', 
-                        style: theme.textTheme.titleMedium,),
-                         Row(
-                          
+                          mainAxisAlignment:MainAxisAlignment.spaceBetween,
                           children: [
-                            IconButton(
-                              color: theme.colorScheme.primary,
-                              onPressed:decrement, icon: const Icon(Icons.remove)),
-                            Text(_personCount.toString(), style: theme.textTheme.titleMedium,),
-                            IconButton(
-                              color: theme.colorScheme.primary,
-                            onPressed: increment, icon: const Icon(Icons.add))
+                          Text('Tip',style: theme.textTheme.titleMedium,),
+                          Text("\$${_tipPercentage*_billTotal}", style: theme.textTheme.bodyLarge)
                           ],
-                        )
-                      ],
-                    )
+                      ),
+
+                      // == Slider Text==
+                      Text('${(_tipPercentage*100).round()}%'),
+                      //== Tip Slider ==
+                      TipSlider(tipPercentage: _tipPercentage, onChanged: (double value) { setState(() {_tipPercentage=value;});})
                     ],
                   ),
                   ),
@@ -146,5 +147,3 @@ class _UTipState extends State<UTip> {
 
 
 }
-
-
