@@ -1,8 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:utip/bill_amount_field.dart';
 import 'package:utip/person_counter.dart';
+import 'package:utip/tip_row.dart';
 import 'package:utip/tip_slider.dart';
+import 'package:utip/total_per_person.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,11 +39,13 @@ class _UTipState extends State<UTip> {
   double _tipPercentage = 0;
   double _billTotal = 100.0;
 
+
+
+  //Methods
+
   double totalPerPerson(){
     return (_billTotal*_tipPercentage+_billTotal)/_personCount;
   }
-
-  //Methods
   void increment(){
     setState(() {
       _personCount++;
@@ -54,9 +57,8 @@ class _UTipState extends State<UTip> {
       if(_personCount>1){
         _personCount--;
       }
-       
     });
-   
+
   }
     //add style
   @override
@@ -76,26 +78,8 @@ class _UTipState extends State<UTip> {
       body:  Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-           Container(
-            padding: const EdgeInsets.all(18),
-            decoration:  BoxDecoration( 
-              color: theme.colorScheme.inversePrimary,
-              borderRadius: BorderRadius.circular(10)
-              ),
-            
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              
-              children: [
-                
-                Text("total per Peson",style: style,),
-                Text("\$$total", style: style.copyWith(
-                  color: theme.colorScheme.onPrimary,
-                  fontSize: theme.textTheme.displaySmall?.fontSize
-                ),),
-                
-              ],
-            )),
+          
+           TotalPerPerson(theme: theme, style: style, total: total),
         Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
@@ -123,13 +107,7 @@ class _UTipState extends State<UTip> {
                     onDecreament: decrement, onIncreament: increment)
                     ,
                      // == section  Tip ==
-                    Row(
-                          mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                          children: [
-                          Text('Tip',style: theme.textTheme.titleMedium,),
-                          Text("\$${_tipPercentage*_billTotal}", style: theme.textTheme.bodyLarge)
-                          ],
-                      ),
+                    TipRow(theme: theme, tipPercentage: _tipPercentage, billTotal: _billTotal),
 
                       // == Slider Text==
                       Text('${(_tipPercentage*100).round()}%'),
@@ -147,3 +125,6 @@ class _UTipState extends State<UTip> {
 
 
 }
+
+
+
